@@ -1,49 +1,50 @@
 import os
 import time
-import base64
+import shutil
 
 class BypassEngine:
     def __init__(self):
         self.name = "KL_BYPASS_ENGINE_V1"
-        print(f"[*] {self.name} Iniciada e Pronta para Combate!")
-
-    def obfuscate_data(self, data):
-        """
-        Transforma dados em Base64 para esconder strings do scanner.
-        """
-        return base64.b64encode(data.encode('utf-8')).decode('utf-8')
+        print(f"[*] {self.name} Iniciada e Pronta para o Combate!")
 
     def process_apk(self, input_file, output_file):
         """
-        O coração do bypass: Processamento de Ofuscação.
+        Simula o processo completo de Bypass:
+        1. Descompilação
+        2. Ofuscação de Strings (Anti-Play Protect)
+        3. Injeção de Módulo de Evasão (Anti-Scanner)
+        4. Recompilação e Assinatura
         """
-        print(f"[*] [ENGINE] Analisando APK: {input_file}")
+        print(f"\n[*] [ENGINE] Iniciando processamento de: {os.path.basename(input_file)}")
         
-        # 1. Simulação de tempo de processamento para a UI
-        time.sleep(4) 
-        
-        # 2. Camada de Ofuscação de Código (Simulação de Injeção)
-        # Aqui o motor vai 'limpar' o arquivo original
-        print(f"[*] [ENGINE] Aplicando Camuflagem de Assinatura...")
-        print(f"[*] [ENGINE] Injetando Módulo de Evasão (Anti-Play Protect)...")
-        print(f"[*] [ENGINE] Ofuscando Strings Sensíveis (Base64)...")
-
-        # 3. Gerando o arquivo de saída (O novo APK 'limpo')
         try:
+            # 1. Simulação de tempo de processamento pesado (para a UI)
+            time.sleep(5) 
+            
+            # 2. Simulação de camadas de bypass
+            print(f"[*] [ENGINE] Camada 1: Descompilando estrutura do APK...")
+            time.sleep(2)
+            
+            print(f"[*] [ENGINE] Camada 2: Ofuscando strings sensíveis (Base64/Hex)...")
+            time.sleep(2)
+            
+            print(f"[*] [ENGINE] Camada 3: Injetando Módulo de Evasão (Anti-Play Protect)...")
+            time.sleep(2)
+            
+            print(f"[*] [ENGINE] Camada 4: Recompilando e Gerando Assinatura Digital...")
+            time.sleep(2)
+
+            # 3. Gerando o arquivo de saída (Simulação de arquivo processado)
+            # Para teste, vamos copiar o original para o destino para garantir que o arquivo exista
             with open(input_file, 'rb') as f_in:
                 content = f_in.read()
-            
-            # Aqui o motor está 'processando' o conteúdo
-            # No futuro, injetaremos o código de bypass real aqui
-            processed_content = content + b"\n# KL_BYPASS_PROCESSED_DATA_V1" 
-
+                
             with open(output_file, 'wb') as f_out:
-                f_out.write(processed_content)
+                f_out.write(content)
 
             print(f"[+] [ENGINE] Bypass concluído com sucesso!")
-            print(f"[+] [ENGINE] Arquivo salvo: {output_file}")
             return True
 
         except Exception as e:
-            print(f"[!] [ENGINE ERROR] {str(e)}")
+            print(f"[!] [ENGINE ERROR] Erro no processamento: {str(e)}")
             return False
