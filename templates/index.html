@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device---scale=1.0">
+    <title>KL BYPASS | Gerador de Payload</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #0a0b10;
+            --card-bg: #161b22;
+            --accent: #00ff41; /* Verde Hacker */
+            --accent-red: #ff3e3e;
+            --text-main: #e6edf3;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            border: 1px solid #30363d;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: #000;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.2);
+            box-shadow: 0 0 15px var(--accent);
+        }
+
+        #status-console {
+            background-color: #000;
+            font-family: 'Courier New', monospace;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--accent);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 2s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class terminal-header mb-10 text-center">
+            <h1 class="text-4xl font-bold text-[#00ff41] tracking-widest uppercase">KL BYPASS ENGINE</h1>
+            <p class="text-gray-400 mt-2">Gerador de Payload com Ofuscação de Alta Camuflagem</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <!-- Coluna 1: Upload e Configuração -->
+            <div class="glass-card p-6 rounded-xl">
+                <h2 class="text-xl font-semibold mb-4"><i class="fas fa-upload mr-2"></i> Upload do APK</h2>
+                <p classs="text-sm text-gray-400 mb-6">Selecione o arquivo APK original para iniciar o processo de bypass.</p>
+                
+                <div class="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-[#00ff41] transition-colors cursor-pointer" id="drop-zone">
+                    <input type="file" id="apk-file" class="hidden" accept=".apk">
+                    <i class="fas fa-file-code text-4xl text-gray.500 mb-4"></i>
+                    <p id="file-name" class="text-sm text-gray-400">Arraste o APK ou clique para selecionar</p>
+                </div>
+
+                <button id="btn-process" class="btn-primary w-full mt-6 py-3 rounded-lg font-bold uppercase tracking-wider">
+                    Iniciar Processamento
+                </button>
+
+                <div id="process-status" class="mt-4 text-center hidden">
+                    <div class="loader mx-auto mb-2" id="loader"></div>
+                    <p class="text-sm text-[#00ff41]" id="status-text">Processando Bypass...</p>
+                </div>
+            </div>
+
+            <!-- Coluna 2: Logs e Status -->
+            <div class="glass-card p-6 rounded-xl">
+                <h2 class="text-xl font-semibold mb-4"><i class="fas fa-terminal mr-2"></i> Console de Sistema</h2>
+                <div id="status-console" class="h-48 rounded-md p-4 text-xs overflow-y-auto">
+                    <div class="text-gray-500">[SISTEMA] Aguardando comando...</div>
+                </div>
+
+                <div class="mt-6">
+                    <h3 class="text-sm font-bold text-gray-400 uppercase mb-2">Status da Operação</h3>
+                    <div class="flex justify-between text-sm">
+                        <span>Engine:</span>
+                        <span class="text-[#00ff41]">V1.0-STABLE</span>
+                    </div>
+                    <div class="flex justify-between text-sm mt-2">
+                        <span>Status:</span>
+                        <span id="engine-status" class="text-yellow-500">STANDBY</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Área de Resultado (Download) -->
+        <div id="result-section" class="mt-10 glass-card p-6 rounded-xl hidden">
+            <h2 class="text-xl font-semibold mb-4 text-[#00ff41]"><i class="fas fa-check-circle mr-2"></i> Bypass Concluído!</h2>
+            <p class="text-gray-400 mb-4">O seu arquivo foi processado e está pronto para download.</p>
+            <a id="download-btn" href="#" class="btn-primary px-6 py-2 rounded-lg inline-block font-bold uppercase text-sm">
+                <i class="fas fa-download mr-2"></i> Baixar APK Ofuscado
+            </a>
+        </div>
+
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('apk-file');
+        const dropZone = document.getElementById('drop-zone');
+        const fileNameText = document.getElementById('file-name');
+        const btnProcess = document.getElementById('btn-process');
+        const statusContainer = document.getElementById('process-status');
+        const statusText = document.getElementById('status-text');
+        const consoleDiv = document.querySelector('#status-console');
+        const resultSection = document.getElementById('result-section');
+        const downloadBtn = document.getElementById('download-btn');
+
+        // Simulação de Log
+        function addLog(msg, type = 'info') {
+            const time = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = 'mb-2';
+            logEntry.innerHTML = `<span class="text-gray-600">[${time}]</span> <span class="${type === 'error' ? 'text-red-500' : 'text-green-500'}">${msg}</span>`;
+            consoleDiv.prepend(logEntry);
+        }
+
+        // Clique para selecionar arquivo
+        dropZone.onclick = () => fileInput.click();
+
+        fileInput.onchange = () => {
+            if(fileInput.files.length > 0) {
+                fileNameText.innerText = fileInput.files[0].name;
+                fileNameText.classList.add('text-[#00ff41]');
+                addLog(`Arquivo selecionado: ${fileInput.files[0].name}`, 'info');
+            }
+        };
+
+        // Botão Processar
+        btnProcess.onclick = async () => {
+            if (fileInput.files.length === 0) {
+                alert("Selecione um arquivo APK primeiro!");
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            // Interface UI
+            btnProcess.disabled = true;
+            btnProcess.classList.add('opacity-50');
+            statusContainer.classList.remove('hidden');
+            document.getElementById('loader').style.display = 'block';
+            addLog("Iniciando upload para o servidor...", "info");
+
+            try {
+                // 1. Upload
+                const uploadResponse = await fetch('/api/v1/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const uploadData = await uploadResponse.json();
+
+                if (uploadData.status !== 'success') throw new Error(uploadData.message);
+                addLog(`Upload concluído: ${uploadData.file}`, 'info');
+
+                // 2. Processamento (Bypass)
+                addLog("Iniciando motor de ofuscação...", "info");
+                statusText.innerText = "Processando Bypass...";
+                
+                const processResponse = await fetch('/api/v1/process', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ filename: uploadData.file })
+                });
+                const processData = await processResponse.json();
+
+                if (processData.status !== 'processing') throw new Error(processData.message);
+
+                // Simulação de tempo de processamento (para visualização)
+                setTimeout(() => {
+                    addLog("Ofuscação de strings concluída!", "info");
+                    addLog("Injetando módulo de camuflagem...", "info");
+                    addLog("Gerando nova assinatura digital...", "info");
+                    addLog("Bypass aplicado com sucesso!", "success");
+
+                    // Mostrar resultado
+                    resultSection.classList.remove('hidden');
+                    downloadBtn.href = `/download/${processData.download_url || uploadData.file}`; // Ajuste de rota
+                    
+                    // Finalizar UI
+                    document.getElementById('loader').style.display = 'none';
+                    statusText.innerText = "Concluído!";
+                    btnProcess.disabled = false;
+                    btnProcess.classList.remove('opacity-50');
+                }, 5000);
+
+            } catch (error) {
+                addLog(`ERRO: ${error.message}`, 'error');
+                document.getElementById('loader').style.display = 'none';
+                statusText.innerText = "Falha no processo.";
+                btnProcess.disabled = false;
+                btnProcess.classList.remove('opacity-50');
+            }
+        };
+    </script>
+</body>
+</html>
